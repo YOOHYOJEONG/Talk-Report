@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/logo.png" width="180" alt="톡리포트 로고"/>
+  <img src="https://github.com/YOOHYOJEONG/Talk-Report/blob/master/assert/logo.png?raw=true" width="180" alt="톡리포트 로고"/>
 </p>
 
 <h1 align="center">📊 톡리포트 — KakaoTalk Chat Analyzer</h1>
@@ -45,7 +45,7 @@
 
 ## 🖼️ 화면 예시
 <p align="center">
-  <img src="./assets/example.png" width="700" alt="톡리포트 화면 예시"/>
+  <img src=".https://github.com/YOOHYOJEONG/Talk-Report/blob/master/assert/example.png?raw=true" width="700" alt="톡리포트 화면 예시"/>
 </p>   
 
 
@@ -91,9 +91,8 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
    
 ### ✔️ 4. 접속
+브라우저에서 아래 주소로 접속 :
 ```bash
-브라우저에서 아래 주소로 접속:
-
 http://localhost:8000
 ```
    
