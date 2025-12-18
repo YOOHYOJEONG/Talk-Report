@@ -25,11 +25,15 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
 });
 
 
-// 사용자별 메시지 수 그래프
 function drawUserCountChart(userCount) {
-    const users = Object.keys(userCount);
-    const counts = Object.values(userCount);
+    // 1) 메시지 수 기준 내림차순 정렬
+    const sorted = Object.entries(userCount)
+        .sort((a, b) => b[1] - a[1]);
 
+    const users = sorted.map(item => item[0]);
+    const counts = sorted.map(item => item[1]);
+
+    // 2) 그래프 그리기
     const trace = {
         x: users,
         y: counts,
@@ -38,14 +42,46 @@ function drawUserCountChart(userCount) {
     };
 
     const layout = {
-        title: "사용자별 메시지 수",
-        xaxis: { title: "사용자" },
+        xaxis: {
+            tickangle: -45,
+            automargin: true
+        },
         yaxis: { title: "메시지 수" },
+        margin: { b: 150 }
     };
 
     Plotly.newPlot("userChart", [trace], layout);
+
+    // 3) 테이블도 같이 생성
+    drawUserTable(sorted);
 }
 
+function drawUserTable(sorted) {
+    const table = document.getElementById("userTable");
+
+    // 테이블 초기화
+    table.innerHTML = `
+        <tr style="background:#f2f2f2; font-weight:bold;">
+            <th>순위</th>
+            <th>사용자</th>
+            <th>메시지 수</th>
+        </tr>
+    `;
+
+    sorted.forEach((item, idx) => {
+        const user = item[0];
+        const count = item[1];
+
+        const row = `
+            <tr>
+                <td>${idx + 1}</td>
+                <td>${user}</td>
+                <td>${count}</td>
+            </tr>
+        `;
+        table.innerHTML += row;
+    });
+}
 
 // 시간대별 메시지 수 그래프
 function drawHourlyChart(hourCount) {
@@ -61,7 +97,6 @@ function drawHourlyChart(hourCount) {
     };
 
     const layout = {
-        title: "시간대별 메시지 수",
         xaxis: { title: "시간 (0~23시)" },
         yaxis: { title: "메시지 수" },
     };
