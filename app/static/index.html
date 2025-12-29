@@ -1,79 +1,200 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>톡리포트 — KakaoTalk Chat Analyzer</title>
+<meta charset="UTF-8" />
+<title>톡리포트 — KakaoTalk Chat Analyzer</title>
 
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-    <style>
-        body {
-            font-family: 'Apple SD Gothic Neo', sans-serif;
-            max-width: 900px;
-            margin: auto;
-            padding: 30px;
-            line-height: 1.6;
-        }
-        .container {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-        }
-        h1, h2 {
-            text-align: center;
-        }
-        input, button {
-            padding: 10px;
-            margin: 5px 0;
-            width: 100%;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-        }
-        button {
-            background: #4A90E2;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #357ABD;
-        }
-    </style>
+<style>
+:root {
+    --primary: #4A90E2;
+    --bg: #f7f8fa;
+    --card: #ffffff;
+    --text: #222;
+    --muted: #666;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+    color: var(--text);
+}
+
+.logo {
+    width: 160px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.header p {
+    margin-top: 8px;
+    color: var(--muted);
+}
+
+.card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+button, input[type="date"] {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+button {
+    cursor: pointer;
+}
+
+button.primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+
+.section-title {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+/* 그래프 영역 */
+.chart {
+    width: 100%;
+    height: 400px;
+}
+
+/* 그래프 ↔ 다음 섹션 간격 */
+#userChart {
+    margin-bottom: 40px;
+}
+
+/* 테이블 기본 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    table-layout: fixed;
+}
+
+#userTable th,
+#userTable td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    text-align: center;
+}
+
+#userTable th {
+    background: #f2f4f7;
+    font-weight: 600;
+}
+
+/* 열 너비 강제 */
+#userTable th:nth-child(1),
+#userTable td:nth-child(1) {
+    width: 60px;           /* 순위 */
+}
+
+#userTable th:nth-child(2),
+#userTable td:nth-child(2) {
+    width: calc(100% - 180px); /* 사용자 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#userTable th:nth-child(3),
+#userTable td:nth-child(3) {
+    width: 120px;          /* 메시지 수 */
+    text-align: right;
+    padding-right: 16px;
+}
+</style>
 </head>
 
 <body>
-
 <div class="container">
-    <h1>톡리포트 — KakaoTalk Chat Analyzer</h1>
 
-    <form id="uploadForm">
-        <label>카카오톡 TXT 파일 업로드</label>
-        <input type="file" id="file" required>
+    <div class="header">
+        <img src="/assert/logo.png" alt="톡리포트 로고" class="logo">
+        <p>KakaoTalk Chat Analyzer</p>
+    </div>
 
-        <label>시작 날짜</label>
-        <input type="date" id="start_date" required>
+    <!-- 숨겨진 실제 input -->
+    <input type="file" id="fileInput" multiple style="display:none;">
+    <input type="file" id="folderInput" multiple webkitdirectory style="display:none;">
 
-        <label>종료 날짜</label>
-        <input type="date" id="end_date" required>
+    <div class="card">
+        <div class="form-row">
+            <button type="button" onclick="selectFiles()">파일 선택</button>
+            <button type="button" onclick="selectFolder()">폴더 선택</button>
 
-        <button type="submit">분석하기</button>
-    </form>
+            <input type="date" id="start_date" required>
+            <input type="date" id="end_date" required>
 
-    <div id="totalMessages" style="margin-top: 20px; font-size: 18px; font-weight: bold;"></div>
+            <button class="primary" id="analyzeBtn">분석하기</button>
+        </div>
 
-    <h2>사용자별 메시지 수</h2>
-    <div id="userChart" style="width:100%; height:400px;"></div>
+        <div id="selectedInfo" style="margin-top:10px; color:#666;">
+            파일 또는 폴더를 선택하세요
+        </div>
+    </div>
 
-    <h3>📋 사용자별 메시지 순위표</h3>
-    <table id="userTable" border="1" 
-        style="width:100%; border-collapse:collapse; margin-top:15px; text-align:center;">
-    </table>
+    <div class="card">
+        <div id="totalMessages"></div>
+    </div>
 
-    <h2>시간대별 메시지 수</h2>
-    <div id="hourChart" style="width:100%; height:400px;"></div>
+    <div class="card">
+        <div class="section-title">👥 사용자별 메시지 수</div>
+        <div id="userChart" class="chart"></div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">📋 사용자별 메시지 순위표</div>
+        <table id="userTable"></table>
+    </div>
+
+    <div class="card">
+        <div class="section-title">📊 시간대별 메시지 수</div>
+        <div id="hourChart" class="chart"></div>
+    </div>
+
 </div>
 
 <script src="/static/script.js"></script>
-
 </body>
 </html>
