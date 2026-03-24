@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from typing import Iterable, Iterator
 
 
 # 날짜 구분선 (PC)
@@ -22,11 +23,10 @@ MOBILE_MESSAGE_PATTERN = re.compile(
 )
 
 
-def parse_kakao_txt(text: str):
-    messages = []
+def iter_kakao_messages(lines: Iterable[str]) -> Iterator[dict]:
     current_date = None
 
-    for line in text.splitlines():
+    for line in lines:
         line = line.strip()
         if not line:
             continue
@@ -52,16 +52,12 @@ def parse_kakao_txt(text: str):
             if ampm == "오전" and hour == 12:
                 hour = 0
 
-            dt = datetime.strptime(
-                f"{current_date} {hour:02d}:{minute}:00",
-                "%Y-%m-%d %H:%M:%S"
-            )
-
-            messages.append({
+            year, month, day = map(int, current_date.split("-"))
+            yield {
                 "user": user,
-                "time": dt,
+                "time": datetime(year, month, day, hour, int(minute)),
                 "content": content
-            })
+            }
             continue
 
         # 모바일 메시지
@@ -76,19 +72,18 @@ def parse_kakao_txt(text: str):
             user = mobile_match.group("user")
             content = mobile_match.group("content")
 
-            dt = datetime(
-                year=year,
-                month=month,
-                day=day,
-                hour=hour,
-                minute=minute
-            )
-
-            messages.append({
+            yield {
                 "user": user,
-                "time": dt,
+                "time": datetime(
+                    year=year,
+                    month=month,
+                    day=day,
+                    hour=hour,
+                    minute=minute
+                ),
                 "content": content
-            })
+            }
             continue
 
-    return messages
+def parse_kakao_txt(text: str):
+    return list(iter_kakao_messages(text.splitlines()))
