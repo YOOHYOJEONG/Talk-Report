@@ -60,8 +60,11 @@
 
 ## 🖼️ 화면 예시
 <p align="center">
-  <img src="https://github.com/YOOHYOJEONG/Talk-Report/blob/master/assert/example.png?raw=true" width="700" alt="톡리포트 화면 예시"/>
+  <img src="https://github.com/YOOHYOJEONG/Talk-Report/blob/master/assert/example_1.png?raw=true" width="700" alt="톡리포트 화면 예시"/>
 </p>   
+<p align="center">
+  <img src="https://github.com/YOOHYOJEONG/Talk-Report/blob/master/assert/example_2.png?raw=true" width="700" alt="톡리포트 화면 예시"/>
+</p>  
 
 
 ## 📝 사용 방법 요약
